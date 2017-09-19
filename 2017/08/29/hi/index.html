@@ -95,17 +95,17 @@
 
 
 
-<meta name="description" content="以后会记录自己的学习内容">
+<meta name="description" content="伴随着iOS11的发布，iOS端App 又是一波适配的工作，emmmmm， 首先再官网上下载了Xcode 9 GM 版本，伴随着Mac OS 从10.12.5 升级到了 10.12.6 （Xcode 9 只支持在最新的系统上运行），还好公司的网速给力，不到俩小时的时间，各种下载工作全部搞定。 对于iOS11 的SDK 更新了哪些内容，这里不做叙述，详情请看： iOS 11 SDK 介绍，Devel">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hi">
+<meta property="og:title" content="RxSwift学习之路">
 <meta property="og:url" content="http://yoursite.com/2017/08/29/hi/index.html">
 <meta property="og:site_name" content="线性不相关">
-<meta property="og:description" content="以后会记录自己的学习内容">
+<meta property="og:description" content="伴随着iOS11的发布，iOS端App 又是一波适配的工作，emmmmm， 首先再官网上下载了Xcode 9 GM 版本，伴随着Mac OS 从10.12.5 升级到了 10.12.6 （Xcode 9 只支持在最新的系统上运行），还好公司的网速给力，不到俩小时的时间，各种下载工作全部搞定。 对于iOS11 的SDK 更新了哪些内容，这里不做叙述，详情请看： iOS 11 SDK 介绍，Devel">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-08T10:20:20.000Z">
+<meta property="og:updated_time" content="2017-09-19T10:29:41.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hi">
-<meta name="twitter:description" content="以后会记录自己的学习内容">
+<meta name="twitter:title" content="RxSwift学习之路">
+<meta name="twitter:description" content="伴随着iOS11的发布，iOS端App 又是一波适配的工作，emmmmm， 首先再官网上下载了Xcode 9 GM 版本，伴随着Mac OS 从10.12.5 升级到了 10.12.6 （Xcode 9 只支持在最新的系统上运行），还好公司的网速给力，不到俩小时的时间，各种下载工作全部搞定。 对于iOS11 的SDK 更新了哪些内容，这里不做叙述，详情请看： iOS 11 SDK 介绍，Devel">
 
 
 
@@ -141,7 +141,7 @@
 
 
 
-  <title>hi | 线性不相关</title>
+  <title>RxSwift学习之路 | 线性不相关</title>
   
 
 
@@ -255,7 +255,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hi</h1>
+          <h1 class="post-title" itemprop="name headline">RxSwift学习之路</h1>
         
 
         <div class="post-meta">
@@ -305,7 +305,57 @@
       
 
       
-        <p>以后会记录自己的学习内容</p>
+        <p>伴随着iOS11的发布，iOS端App 又是一波适配的工作，emmmmm，</p>
+<p>首先再官网上下载了Xcode 9 GM 版本，伴随着Mac OS 从10.12.5 升级到了 10.12.6 （Xcode 9 只支持在最新的系统上运行），还好公司的网速给力，不到俩小时的时间，各种下载工作全部搞定。</p>
+<p>对于iOS11 的SDK 更新了哪些内容，这里不做叙述，详情请看：</p>
+<p>iOS 11 SDK 介绍，Developer iOS以及WWDC的视频啦Updating Your App for iOS 11</p>
+<p>下面主要记录在适配项目App的时候遇到的问题：</p>
+<p>1.首先导航栏自定义View不能点击！！</p>
+<p>导航栏右边Item自定义View</p>
+<p>这就有点尴尬了，于是开始定位问题， 这是一个自定义的View组件， 然后，Autolayout做好约束，规则是这样的，两个Button的Icon 都是固定的尺寸，固定大小， 如图：</p>
+<p>然后发现没有拉左右和上下的约束～ emmmmm，iOS11之前都是没问题的， 然后，拉好约束，如图：</p>
+<p>完美解决。</p>
+<p>2.tableViewSection 莫名出现分割线！！</p>
+<p>效果图如下：</p>
+<p>定位原因，这种是因为自己代码写的TableView，然后AddSubView 到自己的Controller里面的。主要因为Table Views 在iOS11 中默认启用Self-Sizing，我们在iOS 8之后， 使用</p>
+<p>tableView.rowHeight = UITableViewAutomaticDimension</p>
+<p>tableView.estimatedRowHeight = 200</p>
+<p>然后，在cell里面使用Autolayout 拉好上下左右的约束， tableView 就会动态展示内容了，这是因为estimateRowHeight相当于预估算行高的作用。</p>
+<p>然后，项目中，是只写了-tableView: heightForHeaderInSection:和- tableView: heightForFooterInSection:两个方法，而iOS11 里面 ，如果不是闲，相应的viewForSection 方法时，前面两个方法是无效的，</p>
+<p>有两个解决方案：</p>
+<p>一种是你在iOS11下不想使用Self-Sizing的话，可以通过：</p>
+<p>self.tableView.estimatedRowHeight = 0</p>
+<p>self.tableView.estimatedSectionHeaderHeight = 0</p>
+<p>self.tableView.estimatedSectionFooterHeight = 0</p>
+<p>这样的方式关闭。</p>
+<p>二种是你已经使用了Self-Sizing的话，可以通过：</p>
+<p>3.使用了Self-Sizing之后，Autolayout没生效！</p>
+<p>效果如图：</p>
+<p>可以看到，行高都变成默认的 44了，Autolayout并没有生效，没有自动动态展示内容啊～</p>
+<p>然后，发现了这样的一个问题，iOS11 之前，使用Self-Sizing的时候，</p>
+<p>tableView.rowHeight = UITableViewAutomaticDimension</p>
+<p>tableView的属性rowHeight是默认为UITableViewAutomaticDimension，所以我们使用的时候，很多会设置：</p>
+<p>tableView.estimatedRowHeight = 200</p>
+<p>这一句话，但是iOS11 中不行，前面有提到过。解决思路，当然是加上那句话啦。</p>
+<p>tableView.rowHeight = UITableViewAutomaticDimension</p>
+<p>tableView.estimatedRowHeight = 200</p>
+<p>两者同时出现，解决。</p>
+<p>4.关于安全区域Safe Area</p>
+<p>在这里提一点，iOS7 引入的 topLayoutGuide 和 bottomLayoutGuide 在iOS 11 中被废弃了，取而代之就是安全区域的概念，提供了两种方式safeAreaInsets 和 safeAreaLayoutGuide，即 insets 或者 layout guide。</p>
+<p>看图</p>
+<p>勾选Use Safe Area Layout Guides之后，Top Layout Guide 和 Bottom Layout Guide 被替换掉，变成 Safe Area。</p>
+<p>在这里有一个小Tip：</p>
+<p>安全区域针对于iPhoneX的尺寸，来说，效果是可行的， 但是放到8，8plus 上 面，就会莫名多一条分割线。所以，可以写一个小延展，来区别是哪个机型：</p>
+<p>extension UIDevice {</p>
+<p>public func isX() -&gt; Bool {</p>
+<p>if UIScreen.main.bounds.height == 812 {</p>
+<p>return true</p>
+<p>}</p>
+<p>return false</p>
+<p>}</p>
+<p>}</p>
+<p>具体参考如下：</p>
+<p>后续会跟进持续更新，，，</p>
 
       
     </div>
